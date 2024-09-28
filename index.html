@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debate Timer with Reset and Sound</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+
+        .time-setter {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            background-color: #f4f4f4;
+        }
+
+        .time-setter button {
+            font-size: 24px;
+            margin: 0 5px;
+        }
+
+        .time-setter .set-time {
+            font-size: 32px;
+            margin: 0 20px;
+            padding: 0 20px;
+            border: 2px solid black;
+        }
+
+        .timer-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-grow: 1;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .timer-button {
+            width: 45%;
+            height: 100%;
+            font-size: 32px;
+        }
+
+        .pause-button {
+            width: 10%;
+            height: 100%;
+            font-size: 24px;
+            margin: 0 5px;
+            background-color: #ffcc00;
+        }
+
+        .reset-button {
+            width: 20%;
+            height: 100%;
+            font-size: 24px;
+            background-color: #ff4444;
+        }
+
+        .green {
+            background-color: green;
+            color: white;
+        }
+
+        .gray {
+            background-color: gray;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Новый аудио файл -->
+    <audio id="clickSound" preload="auto">
+        <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <div class="time-setter">
+        <button onclick="changeTime(-30)">- 0:30</button>
+        <button onclick="changeTime(-60)">- 1:00</button>
+        <span class="set-time" id="setTime">2:00</span>
+        <button onclick="changeTime(60)">+ 1:00</button>
+        <button onclick="changeTime(30)">+ 0:30</button>
+        <button class="reset-button" onclick="resetTimers()">Reset</button>
+    </div>
+
+    <div class="timer-buttons">
+        <button id="participant1" class="gray timer-button" onclick="startStopTimer(1)">2:00</button>
+        <button class="pause-button" onclick="pauseTimers()">⏸</button>
+        <button id="participant2" class="gray timer-button" onclick="startStopTimer(2)">2:00</button>
+    </div>
+
+    <script>
+        let startMinutes = 2;
+        let originalTime = startMinutes * 60;
+        let time1 = originalTime;
+        let time2 = originalTime;
+        let activeTimer = null;
+        let interval;
+
+        // Функция для воспроизведения звука
+        function playClickSound() {
+            const sound = document.getElementById('clickSound');
+            sound.currentTime = 0;
+            sound.play().catch((error) => {
+                console.log("Ошибка воспроизведения звука: ", error);
+            });
+        }
+
+        function changeTime(seconds) {
+            originalTime = Math.max(30, originalTime + seconds);  // Минимум 30 секунд
+            startMinutes = Math.floor(originalTime / 60);
+            const remainingSeconds = originalTime % 60;
+            document.getElementById('setTime').textContent = `${startMinutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+            time1 = time2 = originalTime;
+            updateTimers();
+        }
+
+        function resetTimers() {
+            // Останавливаем таймеры и возвращаем исходное состояние
+            time1 = time2 = originalTime;
+            stopTimer();
+            updateTimers();
+            document.getElementById('participant1').classList.remove("green");
+            document.getElementById('participant2').classList.remove("green");
+            document.getElementById('participant1').classList.add("gray");
+            document.getElementById('participant2').classList.add("gray");
+            activeTimer = null;
+        }
+
+        function startStopTimer(participant) {
+            const button = document.getElementById(`participant${participant}`);
+
+            // В начале игры даже если кнопка серая, разрешаем начать раунд
+            if (activeTimer === null || button.classList.contains("green")) {
+                playClickSound();  // Воспроизводим звук только если кнопка активная
+                if (activeTimer === null) {
+                    startTimer(participant);
+                } else if (activeTimer === participant) {
+                    stopTimer();  // Останавливаем таймер активного участника
+                    switchTimer();  // Переключаем ход
+                }
+            }
+        }
+
+        function startTimer(participant) {
+            clearInterval(interval);
+
+            if (participant === 1) {
+                activeTimer = 1;
+                document.getElementById('participant1').classList.remove("gray");
+                document.getElementById('participant1').classList.add("green");
+                document.getElementById('participant2').classList.add("gray");
+
+                interval = setInterval(() => {
+                    time1--;
+                    updateTimers();
+                    if (time1 <= 0) {
+                        stopTimer();
+                        switchTimer();
+                    }
+                }, 1000);
+            } else if (participant === 2) {
+                activeTimer = 2;
+                document.getElementById('participant2').classList.remove("gray");
+                document.getElementById('participant2').classList.add("green");
+                document.getElementById('participant1').classList.add("gray");
+
+                interval = setInterval(() => {
+                    time2--;
+                    updateTimers();
+                    if (time2 <= 0) {
+                        stopTimer();
+                        switchTimer();
+                    }
+                }, 1000);
+            }
+        }
+
+        function stopTimer() {
+            clearInterval(interval);
+        }
+
+        function switchTimer() {
+            if (activeTimer === 1 && time2 > 0) {
+                startTimer(2);
+            } else if (activeTimer === 2 && time1 > 0) {
+                startTimer(1);
+            }
+        }
+
+        function updateTimers() {
+            document.getElementById('participant1').textContent = formatTime(time1);
+            document.getElementById('participant2').textContent = formatTime(time2);
+        }
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+        }
+
+        function pauseTimers() {
+            stopTimer();
+            activeTimer = null;
+            document.getElementById('participant1').classList.add("gray");
+            document.getElementById('participant2').classList.add("gray");
+        }
+    </script>
+</body>
+</html>
