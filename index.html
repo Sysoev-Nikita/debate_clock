@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Debate Timer with Reset and Sound</title>
+    <title>Debate Timer with Improved Design</title>
     <style>
         body {
             margin: 0;
@@ -13,7 +13,8 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            font-family: Arial, sans-serif;
+            background-color: #f0f0f5; /* Светлый фон */
+            font-family: 'Arial', sans-serif;
         }
 
         .time-setter {
@@ -23,19 +24,43 @@
             width: 100%;
             padding: 10px;
             box-sizing: border-box;
-            background-color: #f4f4f4;
+            background-color: #ffffff; /* Белый фон для панели настроек */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Тень для панели */
+            border-bottom: 2px solid #ddd; /* Легкое разделение панели и таймеров */
         }
 
         .time-setter button {
             font-size: 24px;
             margin: 0 5px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px; /* Закругленные углы */
+            background-color: #3498db; /* Синий цвет для верхних кнопок */
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Плавный переход цвета и тени */
+            height: 50px;
+        }
+
+        .time-setter button:hover {
+            background-color: #2980b9; /* Темно-синий при наведении */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* Добавим больше тени при наведении */
         }
 
         .time-setter .set-time {
             font-size: 32px;
             margin: 0 20px;
-            padding: 0 20px;
+            padding: 10px 20px;
             border: 2px solid black;
+            border-radius: 8px; /* Закругленные углы */
+            background-color: #ffffff;
+        }
+
+        /* Отдельное оформление для кнопки Reset */
+        .reset-container {
+            margin-left: 20px; /* Отделение кнопки Reset от остальных */
+            padding-left: 20px;
+            border-left: 2px solid #ddd; /* Визуальное разделение */
         }
 
         .timer-buttons {
@@ -44,43 +69,70 @@
             align-items: center;
             flex-grow: 1;
             width: 100%;
+            padding: 20px;
             box-sizing: border-box;
         }
 
         .timer-button {
             width: 45%;
             height: 100%;
-            font-size: 32px;
+            font-size: 72px; /* Большой шрифт */
+            border: none;
+            border-radius: 15px; /* Округленные кнопки */
+            transition: background-color 0.3s ease; /* Плавный переход цвета */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Добавим тень */
+        }
+
+        .timer-button.gray {
+            background-color: #b0b0b0; /* Серый цвет для неактивной кнопки */
+            color: white;
+        }
+
+        .timer-button.green {
+            background-color: #4CAF50; /* Зеленый цвет для активной кнопки */
+            color: white;
+        }
+
+        .timer-button.red {
+            background-color: #e74c3c; /* Красный цвет при окончании времени */
+            color: white;
         }
 
         .pause-button {
             width: 10%;
             height: 100%;
-            font-size: 24px;
+            font-size: 36px;
             margin: 0 5px;
-            background-color: #ffcc00;
+            border: none;
+            border-radius: 10px;
+            background-color: #f39c12; /* Оранжевый цвет */
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Добавим тень */
         }
 
         .reset-button {
-            width: 20%;
-            height: 100%;
+            width: auto;
+            height: 50px;
             font-size: 24px;
-            background-color: #ff4444;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            background-color: #e74c3c; /* Красный цвет */
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Добавлен плавный переход тени */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Добавим тень */
         }
 
-        .green {
-            background-color: green;
-            color: white;
-        }
-
-        .gray {
-            background-color: gray;
-            color: white;
+        .reset-button:hover {
+            background-color: #c0392b; /* Темнее при наведении */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* Добавим больше тени при наведении */
         }
     </style>
 </head>
 <body>
-    <!-- Новый аудио файл -->
+    <!-- Аудио файл для звука -->
     <audio id="clickSound" preload="auto">
         <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
         Your browser does not support the audio element.
@@ -92,7 +144,9 @@
         <span class="set-time" id="setTime">2:00</span>
         <button onclick="changeTime(60)">+ 1:00</button>
         <button onclick="changeTime(30)">+ 0:30</button>
-        <button class="reset-button" onclick="resetTimers()">Reset</button>
+        <div class="reset-container">
+            <button class="reset-button" onclick="resetTimers()">Reset</button>
+        </div>
     </div>
 
     <div class="timer-buttons">
@@ -132,8 +186,8 @@
             time1 = time2 = originalTime;
             stopTimer();
             updateTimers();
-            document.getElementById('participant1').classList.remove("green");
-            document.getElementById('participant2').classList.remove("green");
+            document.getElementById('participant1').classList.remove("green", "red");
+            document.getElementById('participant2').classList.remove("green", "red");
             document.getElementById('participant1').classList.add("gray");
             document.getElementById('participant2').classList.add("gray");
             activeTimer = null;
@@ -144,11 +198,15 @@
 
             // В начале игры даже если кнопка серая, разрешаем начать раунд
             if (activeTimer === null || button.classList.contains("green")) {
-                playClickSound();  // Воспроизводим звук только если кнопка активная
+                if (!button.classList.contains("gray")) {  // Проверяем, что кнопка не серая
+                    playClickSound();  // Воспроизводим звук только если кнопка активная
+                }
                 if (activeTimer === null) {
                     startTimer(participant);
                 } else if (activeTimer === participant) {
                     stopTimer();  // Останавливаем таймер активного участника
+                    document.getElementById(`participant${participant}`).classList.remove("green");
+                    document.getElementById(`participant${participant}`).classList.add("gray"); // Делаем кнопку серой
                     switchTimer();  // Переключаем ход
                 }
             }
@@ -168,6 +226,8 @@
                     updateTimers();
                     if (time1 <= 0) {
                         stopTimer();
+                        document.getElementById('participant1').classList.remove("green");
+                        document.getElementById('participant1').classList.add("red");  // Меняем цвет на красный
                         switchTimer();
                     }
                 }, 1000);
@@ -182,6 +242,8 @@
                     updateTimers();
                     if (time2 <= 0) {
                         stopTimer();
+                        document.getElementById('participant2').classList.remove("green");
+                        document.getElementById('participant2').classList.add("red");  // Меняем цвет на красный
                         switchTimer();
                     }
                 }, 1000);
@@ -194,9 +256,9 @@
 
         function switchTimer() {
             if (activeTimer === 1 && time2 > 0) {
-                startTimer(2);
+                startTimer(2); // Переход хода ко второму участнику
             } else if (activeTimer === 2 && time1 > 0) {
-                startTimer(1);
+                startTimer(1); // Переход хода к первому участнику
             }
         }
 
@@ -214,6 +276,8 @@
         function pauseTimers() {
             stopTimer();
             activeTimer = null;
+            document.getElementById('participant1').classList.remove("green"); // Делаем кнопки серыми
+            document.getElementById('participant2').classList.remove("green");
             document.getElementById('participant1').classList.add("gray");
             document.getElementById('participant2').classList.add("gray");
         }
