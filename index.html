@@ -1,8 +1,7 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- Мета-тег для предотвращения масштабирования -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
     <title>Debate Timer</title>
     <style>
@@ -11,12 +10,11 @@
             padding: 0;
             display: flex;
             flex-direction: column;
-            justify-content: space-between; /* Растягиваем элементы по высоте */
+            justify-content: space-between;
             align-items: center;
             height: 100vh;
             background-color: #f0f0f5;
             font-family: 'Arial', sans-serif;
-            overflow: hidden; /* Предотвращаем прокрутку */
         }
 
         .time-setter {
@@ -70,7 +68,6 @@
             align-items: center;
             flex-grow: 1; /* Заставляем кнопки занимать всю оставшуюся высоту */
             width: 100%;
-            max-width: 100vw; /* Гарантируем, что кнопки не выйдут за пределы экрана */
             padding: 20px;
             box-sizing: border-box;
         }
@@ -154,11 +151,6 @@
             align-items: center;
             text-align: center;
             z-index: 9999;
-            pointer-events: none; /* Не блокируем жесты */
-        }
-
-        #rotateMessage .message {
-            pointer-events: auto; /* Разрешаем взаимодействие только с содержимым сообщения, если необходимо */
         }
     </style>
 </head>
@@ -170,9 +162,7 @@
     </audio>
 
     <!-- Сообщение о перевороте устройства -->
-    <div id="rotateMessage">
-        <div class="message">Пожалуйста, переверните устройство в горизонтальный режим для лучшего отображения.</div>
-    </div>
+    <div id="rotateMessage">Пожалуйста, переверните устройство в горизонтальный режим для лучшего отображения.</div>
 
     <div class="time-setter">
         <button onclick="changeTime(-30)">- 0:30</button>
@@ -204,7 +194,7 @@
         function checkOrientation() {
             if (window.innerHeight > window.innerWidth) {
                 document.getElementById('rotateMessage').style.display = 'flex';
-                document.body.style.overflow = 'hidden';  // Отключаем прокрутку
+                document.body.style.overflow = 'auto';  // Позволяем жесту обновления работать
             } else {
                 document.getElementById('rotateMessage').style.display = 'none';
                 document.body.style.overflow = 'auto';  // Возвращаем прокрутку при горизонтальном режиме
@@ -221,10 +211,6 @@
                 if ('wakeLock' in navigator) {
                     wakeLock = await navigator.wakeLock.request('screen');
                     console.log("Screen Wake Lock activated.");
-                    // Обработчик для восстановления блокировки при разрыве соединения
-                    wakeLock.addEventListener('release', () => {
-                        console.log('Screen Wake Lock was released');
-                    });
                 }
             } catch (err) {
                 console.error(`${err.name}, ${err.message}`);
