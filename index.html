@@ -74,15 +74,20 @@
 
         .timer-button {
             width: 45%;
-            height: 100%; /* Делаем кнопку высокой на всю доступную высоту */
-            font-size: 100px;  /* Уменьшили размер шрифта */
+            height: 100%;
+            font-size: 100px;
             border: none;
             border-radius: 15px;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.1s ease; /* Добавляем плавный переход для трансформации */
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             display: flex;
             justify-content: center;
-            align-items: center; /* Центрируем текст внутри кнопок */
+            align-items: center;
+        }
+        
+        .timer-button:active {
+            transform: scale(0.97); /* Уменьшение кнопки при нажатии */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Уменьшаем тень для более выраженного эффекта нажатия */
         }
 
         .timer-button.gray {
@@ -114,6 +119,12 @@
             display: flex;
             justify-content: center;
             align-items: center; /* Центрируем текст */
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+
+        .pause-button:active {
+            transform: scale(0.97); /* Уменьшение кнопки при нажатии */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Уменьшаем тень для более выраженного эффекта */
         }
 
         .reset-button {
